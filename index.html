@@ -2,229 +2,107 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MenuTracker">
 <title>MenuTracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0f1115;
-    color: #e8eaed;
-    min-height: 100vh;
-    padding: 16px;
-    padding-bottom: 80px;
+    background: #0f1115; color: #e8eaed; min-height: 100vh;
   }
+  body { padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   .container { max-width: 720px; margin: 0 auto; }
 
-  h1 {
-    font-size: 22px;
-    margin-bottom: 4px;
+  h1 { font-size: 22px; margin-bottom: 4px;
     background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
   .subtitle { color: #8a8f98; font-size: 13px; margin-bottom: 20px; }
 
-  .card {
-    background: #1a1d23;
-    border: 1px solid #262a32;
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 14px;
-  }
-  .card h2 {
-    font-size: 15px;
-    margin-bottom: 12px;
-    color: #b8bcc4;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .card { background: #1a1d23; border: 1px solid #262a32; border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .card h2 { font-size: 15px; margin-bottom: 12px; color: #b8bcc4; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
-  input, button, textarea {
-    font-family: inherit;
-    font-size: 14px;
+  input, button, textarea { font-family: inherit; font-size: 16px; }
+  input[type="text"], input[type="number"], input[type="time"], textarea {
+    background: #0f1115; border: 1px solid #2a2f38; color: #e8eaed;
+    padding: 10px 12px; border-radius: 8px; width: 100%; outline: none; transition: border 0.2s;
   }
-  input[type="text"], input[type="number"], input[type="time"] {
-    background: #0f1115;
-    border: 1px solid #2a2f38;
-    color: #e8eaed;
-    padding: 10px 12px;
-    border-radius: 8px;
-    width: 100%;
-    outline: none;
-    transition: border 0.2s;
-  }
-  input:focus { border-color: #ff8a4c; }
+  input:focus, textarea:focus { border-color: #ff8a4c; }
+  textarea { resize: vertical; min-height: 110px; line-height: 1.5; }
 
-  button {
-    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
+  button { background: linear-gradient(90deg, #ff8a4c, #ff5e7e); color: #fff; border: none;
+    padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
   button:hover { opacity: 0.9; }
-  button.secondary {
-    background: #262a32;
-    color: #b8bcc4;
-  }
-  button.danger {
-    background: #3a1f24;
-    color: #ff6b81;
-  }
+  button:active { transform: scale(0.98); }
+  button.secondary { background: #262a32; color: #b8bcc4; }
+  button.danger { background: #3a1f24; color: #ff6b81; }
 
   .row { display: flex; gap: 10px; }
   .row > * { flex: 1; }
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .stat {
-    background: #0f1115;
-    border: 1px solid #262a32;
-    border-radius: 10px;
-    padding: 12px;
-  }
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+  .stat { background: #0f1115; border: 1px solid #262a32; border-radius: 10px; padding: 12px; }
   .stat .label { font-size: 11px; color: #8a8f98; text-transform: uppercase; letter-spacing: 0.5px; }
   .stat .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
   .stat .value.green { color: #4ade80; }
   .stat .value.orange { color: #ff8a4c; }
   .stat .value.blue { color: #60a5fa; }
 
-  .progress-bar {
-    height: 10px;
-    background: #0f1115;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 8px;
-    border: 1px solid #262a32;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
-    transition: width 0.4s ease;
-  }
+  .progress-bar { height: 10px; background: #0f1115; border-radius: 5px; overflow: hidden; margin-top: 8px; border: 1px solid #262a32; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #ff8a4c, #ff5e7e); transition: width 0.4s ease; }
 
-  .meal {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: #0f1115;
-    border: 1px solid #262a32;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    transition: all 0.2s;
-  }
-  .meal.done {
-    background: #16241a;
-    border-color: #2a4a35;
-    opacity: 0.85;
-  }
+  .meal { display: flex; align-items: center; gap: 12px; padding: 12px;
+    background: #0f1115; border: 1px solid #262a32; border-radius: 10px; margin-bottom: 8px; transition: all 0.2s; }
+  .meal.done { background: #16241a; border-color: #2a4a35; opacity: 0.85; }
   .meal.done .meal-name { text-decoration: line-through; color: #6b7280; }
 
-  .check {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 2px solid #3a3f48;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
-    background: transparent;
-  }
-  .check.on {
-    background: #4ade80;
-    border-color: #4ade80;
-  }
-  .check.on::after {
-    content: '✓';
-    color: #0f1115;
-    font-weight: 900;
-    font-size: 14px;
-  }
+  .check { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #3a3f48; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: transparent; }
+  .check.on { background: #4ade80; border-color: #4ade80; }
+  .check.on::after { content: '✓'; color: #0f1115; font-weight: 900; font-size: 15px; }
 
   .meal-info { flex: 1; min-width: 0; }
-  .meal-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .meal-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; word-break: break-word; }
   .meal-time { font-size: 12px; color: #8a8f98; }
   .meal-cal { font-size: 13px; color: #ff8a4c; font-weight: 600; white-space: nowrap; }
 
-  .empty {
-    text-align: center;
-    color: #6b7280;
-    padding: 20px;
-    font-size: 13px;
-  }
+  .empty { text-align: center; color: #6b7280; padding: 20px; font-size: 13px; }
 
-  .history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    background: #0f1115;
-    border-radius: 8px;
-    margin-bottom: 6px;
-    font-size: 13px;
-  }
+  .history-item { display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; background: #0f1115; border-radius: 8px; margin-bottom: 6px; font-size: 13px; gap: 8px; }
   .history-item .date { color: #b8bcc4; }
   .history-item .kcal { color: #ff8a4c; font-weight: 600; }
   .history-item .count { color: #8a8f98; font-size: 12px; }
 
-  .tabs {
-    display: flex;
-    gap: 4px;
-    background: #1a1d23;
-    padding: 4px;
-    border-radius: 10px;
-    margin-bottom: 14px;
-    border: 1px solid #262a32;
-  }
-  .tab {
-    flex: 1;
-    padding: 8px;
-    text-align: center;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: #8a8f98;
-    transition: all 0.2s;
-    background: transparent;
-    border: none;
-  }
-  .tab.active {
-    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
-    color: #fff;
-  }
+  .tabs { display: flex; gap: 4px; background: #1a1d23; padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid #262a32; }
+  .tab { flex: 1; padding: 8px; text-align: center; border-radius: 7px; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: #8a8f98; transition: all 0.2s; background: transparent; border: none; }
+  .tab.active { background: linear-gradient(90deg, #ff8a4c, #ff5e7e); color: #fff; }
 
-  .badge {
-    display: inline-block;
-    background: #262a32;
-    color: #b8bcc4;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    margin-left: 6px;
-  }
+  .badge { display: inline-block; background: #262a32; color: #b8bcc4; padding: 2px 8px; border-radius: 6px; font-size: 11px; margin-left: 6px; }
 
   .hide { display: none !important; }
+
+  /* Tipos de refeição com cores */
+  .meal-type { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #8a8f98; margin-bottom: 2px; }
+  .type-pa { color: #fbbf24; }
+  .type-al { color: #4ade80; }
+  .type-la { color: #60a5fa; }
+  .type-ja { color: #c084fc; }
+  .type-extra { color: #f472b6; }
+
+  .hint { font-size: 12px; color: #8a8f98; line-height: 1.5; margin-bottom: 10px; }
+  .hint code { background: #0f1115; padding: 1px 5px; border-radius: 4px; color: #ff8a4c; font-size: 11px; }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>🍽️ MenuTracker</h1>
-  <div class="subtitle">Bate o teu menu do dia, todos os dias.</div>
+  <div class="subtitle">Cola o menu do dia e ele trata do resto.</div>
 
   <div class="tabs">
     <button class="tab active" data-tab="today">Hoje</button>
@@ -232,9 +110,8 @@
     <button class="tab" data-tab="settings">Definições</button>
   </div>
 
-  <!-- ===================== HOJE ===================== -->
+  <!-- ============ HOJE ============ -->
   <div id="tab-today">
-    <!-- Stats -->
     <div class="card">
       <h2>📊 Resumo de Hoje</h2>
       <div class="stats-grid">
@@ -250,25 +127,25 @@
       <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
     </div>
 
-    <!-- Adicionar refeição -->
     <div class="card">
-      <h2>➕ Adicionar Refeição ao Menu</h2>
-      <div class="row" style="margin-bottom:10px;">
-        <input type="text" id="new-name" placeholder="Nome (ex: Frango grelhado)">
+      <h2>📋 Colar Menu do Dia</h2>
+      <div class="hint">
+        Cola o menu uma linha por refeição. Exemplo:<br>
+        <code>Pequeno almoço - cereais</code><br>
+        <code>Almoço - Esparguete à bolonhesa</code><br>
+        <code>Lanche - Wrap de atum</code>
       </div>
-      <div class="row" style="margin-bottom:10px;">
-        <input type="number" id="new-kcal" placeholder="Calorias" min="0">
+      <textarea id="menu-input" placeholder="Menu 17/9&#10;Pequeno almoço - cereais&#10;Almoço - Esparguete à bolonhesa&#10;Lanche - Wrap de pasta de atum com alface e abacate&#10;Lanche - Melancia&#10;Lanche - Sandes de ovo, abacate e bacon e batido de manga e aveia&#10;Jantar - igual ao nosso e 1 pêssego&#10;Lanche - Iogurtes&#10;Lanche - Torradas com manteiga e leite com chocolate"></textarea>
+      <div class="row" style="margin-top:10px;">
+        <button onclick="parseAndAddMenu()" style="width:100%;">🍽️ Adicionar Menu</button>
       </div>
-      <button onclick="addMeal()" style="width:100%;">Adicionar</button>
     </div>
 
-    <!-- Menu do dia -->
     <div class="card">
       <h2>🍴 Menu de Hoje <span class="badge" id="meal-count-badge">0</span></h2>
       <div id="meals-list"></div>
     </div>
 
-    <!-- Horário -->
     <div class="card">
       <h2>⏰ Horário de Refeições</h2>
       <div class="row" style="margin-bottom:12px;">
@@ -285,7 +162,7 @@
     </div>
   </div>
 
-  <!-- ===================== HISTÓRICO ===================== -->
+  <!-- ============ HISTÓRICO ============ -->
   <div id="tab-history" class="hide">
     <div class="card">
       <h2>🏆 Recordes</h2>
@@ -311,50 +188,163 @@
     </div>
   </div>
 
-  <!-- ===================== DEFINIÇÕES ===================== -->
+  <!-- ============ DEFINIÇÕES ============ -->
   <div id="tab-settings" class="hide">
     <div class="card">
       <h2>⚙️ Definições</h2>
       <p style="font-size:13px;color:#8a8f98;line-height:1.6;">
-        Esta app guarda tudo localmente no teu dispositivo (localStorage).<br><br>
-        • Adiciona as refeições do menu do dia na aba <b>Hoje</b>.<br>
+        • Cola o menu do dia na aba <b>Hoje</b> — ele separa automaticamente cada refeição.<br>
+        • As calorias são estimadas com uma base de dados de alimentos.<br>
         • Marca o check quando comeres cada uma.<br>
-        • O horário de refeições é distribuído automaticamente entre a hora de acordar e a de adormecer.<br>
         • Vê os teus recordes na aba <b>Histórico</b>.
       </p>
     </div>
     <div class="card">
-      <h2>🔔 Tarefas de hoje</h2>
-      <button class="secondary" style="width:100%;margin-bottom:8px;" onclick="resetTodayChecks()">
-        Reiniciar checks de hoje
-      </button>
+      <h2>🔧 Ações</h2>
+      <button class="secondary" style="width:100%;margin-bottom:8px;" onclick="resetTodayChecks()">Reiniciar checks de hoje</button>
+      <button class="secondary" style="width:100%;" onclick="exportData()">Exportar dados (backup)</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ============ ESTADO ============ */
-const STORAGE_KEY = 'menuTracker_v1';
+/* ============================================================
+   BASE DE DADOS DE ALIMENTOS (valores aproximados por porção)
+   Valores médios em kcal para uma porção normal portuguesa.
+   ============================================================ */
+const FOOD_DB = [
+  // Pequeno-almoço
+  { k:['cereais','cereal','corn flakes','flocos'], kcal: 180 },
+  { k:['leite com chocolate','leite chocolate','leite achocolatado'], kcal: 160 },
+  { k:['leite'], kcal: 120 },
+  { k:['pão','pao','papo seco','papo-seco'], kcal: 140 },
+  { k:['torrada','torradas'], kcal: 130 },
+  { k:['manteiga'], kcal: 70 },
+  { k:['queijo'], kcal: 100 },
+  { k:['fiambre'], kcal: 60 },
+  { k:['ovo','ovos'], kcal: 80 },
+  { k:['iogurte','iogurtes'], kcal: 100 },
+  { k:['sumo','sumo de laranja'], kcal: 110 },
+  { k:['café','cafe'], kcal: 5 },
+  { k:['tosta mista'], kcal: 300 },
+  { k:['croissant'], kcal: 280 },
+  { k:['bolo','bolachas'], kcal: 200 },
+
+  // Frutas
+  { k:['melancia'], kcal: 80 },
+  { k:['melão','melao'], kcal: 60 },
+  { k:['maçã','maca'], kcal: 90 },
+  { k:['banana'], kcal: 105 },
+  { k:['laranja'], kcal: 70 },
+  { k:['pêssego','pessego'], kcal: 60 },
+  { k:['pera'], kcal: 95 },
+  { k:['uvas'], kcal: 90 },
+  { k:['morango','morangos'], kcal: 50 },
+  { k:['kiwi'], kcal: 60 },
+  { k:['manga'], kcal: 100 },
+  { k:['abacate'], kcal: 160 },
+  { k:['fruta'], kcal: 80 },
+
+  // Pratos principais
+  { k:['esparguete à bolonhesa','esparguete a bolonhesa','esparguete bolonhesa','spaghetti bolonhesa'], kcal: 600 },
+  { k:['esparguete','spaghetti','massa'], kcal: 500 },
+  { k:['bolonhesa','carne picada'], kcal: 250 },
+  { k:['arroz de frango','frango com arroz'], kcal: 600 },
+  { k:['arroz'], kcal: 250 },
+  { k:['frango grelhado','frango'], kcal: 350 },
+  { k:['bife','vaca','vaca grelhada'], kcal: 400 },
+  { k:['porco','lombo'], kcal: 400 },
+  { k:['peixe','bacalhau','salmão','salmao','atum grelhado'], kcal: 350 },
+  { k:['bacalhau à brás','bacalhau a bras'], kcal: 550 },
+  { k:['feijoada'], kcal: 650 },
+  { k:['sopa','caldo verde'], kcal: 150 },
+  { k:['salada'], kcal: 120 },
+  { k:['batata','batatas'], kcal: 200 },
+  { k:['puré','pure'], kcal: 220 },
+  { k:['lasanha'], kcal: 600 },
+  { k:['pizza'], kcal: 700 },
+  { k:['hambúrguer','hamburguer','burger'], kcal: 550 },
+  { k:['sandes','sanduíche','sanduiche'], kcal: 300 },
+  { k:['wrap'], kcal: 350 },
+  { k:['tosta'], kcal: 200 },
+  { k:['carne'], kcal: 350 },
+  { k:['legumes','legumes cozidos'], kcal: 100 },
+  { k:['igual ao nosso','igual ao almoço','igual ao jantar'], kcal: 500 },
+
+  // Lanches / extras
+  { k:['batido','smoothie'], kcal: 200 },
+  { k:['aveia'], kcal: 150 },
+  { k:['pasta de atum','atum'], kcal: 200 },
+  { k:['alface'], kcal: 15 },
+  { k:['bacon'], kcal: 120 },
+  { k:['queijo flamengo','queijo fatiado'], kcal: 80 },
+  { k:['bolacha','bolachas'], kcal: 150 },
+  { k:['chocolate'], kcal: 150 },
+  { k:['gelado'], kcal: 200 },
+  { k:['água','agua'], kcal: 0 },
+  { k:['café com leite','galão','galao','meia de leite'], kcal: 90 },
+  { k:['cerveja'], kcal: 140 },
+  { k:['coca-cola','coca cola','refrigerante'], kcal: 140 },
+];
+
+/* Procura calorias para um texto. Soma todas as palavras-chave que encontra. */
+function estimateCalories(text) {
+  const t = text.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // remove acentos para comparar
+  let total = 0;
+  let found = [];
+  for (const food of FOOD_DB) {
+    for (const key of food.k) {
+      const kNorm = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      // palavra inteira (com fronteira)
+      const re = new RegExp('(^|[^a-z0-9])' + kNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)', 'i');
+      if (re.test(t)) {
+        total += food.kcal;
+        found.push(key);
+        break; // só conta uma vez por alimento
+      }
+    }
+  }
+  return { kcal: total, found };
+}
+
+/* Deteta o tipo de refeição a partir do texto */
+function detectType(text) {
+  const t = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (/pequeno\s*almoco|pequeno-almoço|breakfast/.test(t)) return { type:'PA', label:'Pequeno Almoço', cls:'type-pa' };
+  if (/almoco/.test(t)) return { type:'AL', label:'Almoço', cls:'type-al' };
+  if (/jantar/.test(t)) return { type:'JA', label:'Jantar', cls:'type-ja' };
+  if (/lanche/.test(t)) return { type:'LA', label:'Lanche', cls:'type-la' };
+  if (/ceia|snack/.test(t)) return { type:'CE', label:'Ceia', cls:'type-extra' };
+  return { type:'EX', label:'Refeição', cls:'type-extra' };
+}
+
+/* Remove o prefixo "Pequeno almoço -", "Almoço -", etc. do nome */
+function stripPrefix(text) {
+  return text.replace(/^\s*(pequeno[\s-]*almoço|pequeno[\s-]*almoco|almoço|almoco|jantar|lanche|ceia|snack)\s*[-–:]\s*/i, '').trim();
+}
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+const STORAGE_KEY = 'menuTracker_v2';
 
 let state = {
-  meals: [],          // refeições do dia atual [{id, name, kcal, done}]
+  meals: [],
   wake: '07:00',
   sleep: '23:00',
-  history: {},        // { 'YYYY-MM-DD': { meals: [...], wake, sleep } }
+  history: {},
   currentDate: todayStr()
 };
 
 function todayStr() {
   const d = new Date();
-  return d.toISOString().slice(0, 10);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 function load() {
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) {
-    try { state = { ...state, ...JSON.parse(raw) }; } catch(e) {}
-  }
-  // Se mudou o dia, guarda o anterior no histórico e reinicia
+  if (raw) { try { state = { ...state, ...JSON.parse(raw) }; } catch(e) {} }
   if (state.currentDate !== todayStr()) {
     saveDayToHistory(state.currentDate);
     state.meals = [];
@@ -363,53 +353,100 @@ function load() {
   }
 }
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
 function saveDayToHistory(date) {
   if (!state.meals || state.meals.length === 0) return;
   state.history[date] = {
     meals: JSON.parse(JSON.stringify(state.meals)),
-    wake: state.wake,
-    sleep: state.sleep
+    wake: state.wake, sleep: state.sleep
   };
 }
 
-/* ============ HELPERS ============ */
-function timeToMinutes(t) {
-  const [h, m] = t.split(':').map(Number);
-  return h * 60 + m;
-}
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function timeToMinutes(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
 function minutesToTime(m) {
   m = ((m % 1440) + 1440) % 1440;
-  const h = Math.floor(m / 60);
-  const mm = m % 60;
-  return String(h).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+  return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0');
 }
-
-/* Distribui N refeições entre acordar e adormecer */
 function distributeTimes(n, wake, sleep) {
   if (n === 0) return [];
-  let start = timeToMinutes(wake);
-  let end = timeToMinutes(sleep);
-  if (end <= start) end += 1440; // dorme depois da meia-noite
-  const total = end - start;
-
-  const times = [];
-  if (n === 1) {
-    times.push(minutesToTime(start + total / 2));
-  } else {
-    // Intervalos iguais, com margem nas pontas
+  let start = timeToMinutes(wake), end = timeToMinutes(sleep);
+  if (end <= start) end += 1440;
+  const total = end - start, times = [];
+  if (n === 1) times.push(minutesToTime(start + total/2));
+  else {
     const step = total / (n + 1);
-    for (let i = 1; i <= n; i++) {
-      times.push(minutesToTime(start + step * i));
-    }
+    for (let i = 1; i <= n; i++) times.push(minutesToTime(start + step*i));
   }
   return times;
 }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-/* ============ RENDER ============ */
+/* ============================================================
+   PARSER DO MENU COLADO
+   ============================================================ */
+function parseAndAddMenu() {
+  const raw = document.getElementById('menu-input').value.trim();
+  if (!raw) return alert('Cola o menu primeiro.');
+
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const added = [];
+  const unknown = [];
+
+  for (const line of lines) {
+    // Ignora linhas que são só "Menu 17/9" ou datas
+    if (/^menu\b/i.test(line) && !/[-–:]/.test(line)) continue;
+    if (/^\d{1,2}[\/\-]\d{1,2}([\/\-]\d{2,4})?$/.test(line)) continue;
+
+    // Ignora linhas sem separador (não parecem refeições)
+    if (!/[-–:]/.test(line)) {
+      // mas se tiver tipo no início, ainda tenta
+      const t = detectType(line);
+      if (t.type === 'EX') continue;
+    }
+
+    const typeInfo = detectType(line);
+    const name = stripPrefix(line) || line;
+
+    const { kcal, found } = estimateCalories(name);
+
+    if (kcal === 0) unknown.push(name);
+
+    added.push({
+      id: Date.now() + Math.random(),
+      name: name,
+      kcal: kcal,
+      done: false,
+      type: typeInfo.type,
+      typeLabel: typeInfo.label,
+      typeCls: typeInfo.cls,
+      estimated: true
+    });
+  }
+
+  if (added.length === 0) return alert('Não consegui identificar refeições no texto. Uma linha por refeição, ex: "Lanche - Melancia".');
+
+  // Junta ao que já existe
+  state.meals = state.meals.concat(added);
+  document.getElementById('menu-input').value = '';
+  save();
+  render();
+
+  let msg = '✅ Adicionadas ' + added.length + ' refeições.';
+  if (unknown.length > 0) {
+    msg += '\n\n⚠️ Sem calorias conhecidas (podes editar depois):\n• ' + unknown.join('\n• ');
+  }
+  alert(msg);
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
 function render() {
   renderMeals();
   renderStats();
@@ -433,10 +470,11 @@ function renderMeals() {
     <div class="meal ${m.done ? 'done' : ''}">
       <div class="check ${m.done ? 'on' : ''}" onclick="toggleMeal(${m.id})"></div>
       <div class="meal-info">
+        <div class="meal-type ${m.typeCls || ''}">${escapeHtml(m.typeLabel || 'Refeição')}</div>
         <div class="meal-name">${escapeHtml(m.name)}</div>
         <div class="meal-time">⏰ ${times[i]}</div>
       </div>
-      <div class="meal-cal">${m.kcal} kcal</div>
+      <div class="meal-cal">${m.kcal > 0 ? m.kcal + ' kcal' : '— kcal'}</div>
       <button class="danger" style="padding:6px 10px;font-size:12px;" onclick="removeMeal(${m.id})">✕</button>
     </div>
   `).join('');
@@ -444,169 +482,4 @@ function renderMeals() {
 
 function renderStats() {
   const total = state.meals.length;
-  const done = state.meals.filter(m => m.done).length;
-  const kcal = state.meals.filter(m => m.done).reduce((s, m) => s + Number(m.kcal || 0), 0);
-
-  document.getElementById('stat-meals').textContent = `${done} / ${total}`;
-  document.getElementById('stat-kcal').textContent = `${kcal}`;
-  const pct = total ? (done / total) * 100 : 0;
-  document.getElementById('progress').style.width = pct + '%';
-}
-
-function renderSchedule() {
-  const el = document.getElementById('schedule-list');
-  if (state.meals.length === 0) {
-    el.innerHTML = '<div class="empty">Adiciona refeições para ver os horários.</div>';
-    return;
-  }
-  const times = distributeTimes(state.meals.length, state.wake, state.sleep);
-  el.innerHTML = state.meals.map((m, i) => `
-    <div class="history-item">
-      <span class="date">${times[i]}</span>
-      <span>${escapeHtml(m.name)}</span>
-      <span class="kcal">${m.kcal} kcal</span>
-    </div>
-  `).join('');
-}
-
-function renderHistory() {
-  const entries = Object.entries(state.history).sort((a, b) => b[0].localeCompare(a[0]));
-  const list = document.getElementById('history-list');
-
-  if (entries.length === 0) {
-    list.innerHTML = '<div class="empty">Ainda sem histórico. Volta amanhã!</div>';
-  } else {
-    list.innerHTML = entries.map(([date, day]) => {
-      const totalKcal = day.meals.filter(m => m.done).reduce((s, m) => s + Number(m.kcal || 0), 0);
-      const done = day.meals.filter(m => m.done).length;
-      const total = day.meals.length;
-      const d = new Date(date + 'T00:00:00');
-      const label = d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', weekday: 'short' });
-      return `
-        <div class="history-item">
-          <span class="date">${label}</span>
-          <span class="count">${done}/${total} refeições</span>
-          <span class="kcal">${totalKcal} kcal</span>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // Recordes
-  const withKcal = entries
-    .map(([date, day]) => ({
-      date,
-      kcal: day.meals.filter(m => m.done).reduce((s, m) => s + Number(m.kcal || 0), 0)
-    }))
-    .filter(x => x.kcal > 0);
-
-  if (withKcal.length > 0) {
-    const most = withKcal.reduce((a, b) => a.kcal > b.kcal ? a : b);
-    const less = withKcal.reduce((a, b) => a.kcal < b.kcal ? a : b);
-    document.getElementById('rec-most').textContent = most.kcal + ' kcal';
-    document.getElementById('rec-most-date').textContent = formatDate(most.date);
-    document.getElementById('rec-less').textContent = less.kcal + ' kcal';
-    document.getElementById('rec-less-date').textContent = formatDate(less.date);
-  } else {
-    document.getElementById('rec-most').textContent = '—';
-    document.getElementById('rec-most-date').textContent = '—';
-    document.getElementById('rec-less').textContent = '—';
-    document.getElementById('rec-less-date').textContent = '—';
-  }
-}
-
-function formatDate(iso) {
-  const d = new Date(iso + 'T00:00:00');
-  return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
-
-/* ============ AÇÕES ============ */
-function addMeal() {
-  const name = document.getElementById('new-name').value.trim();
-  const kcal = parseInt(document.getElementById('new-kcal').value, 10);
-  if (!name) return alert('Dá um nome à refeição.');
-  if (isNaN(kcal) || kcal < 0) return alert('Insere um valor de calorias válido.');
-  state.meals.push({ id: Date.now(), name, kcal, done: false });
-  document.getElementById('new-name').value = '';
-  document.getElementById('new-kcal').value = '';
-  save();
-  render();
-}
-
-function toggleMeal(id) {
-  const m = state.meals.find(x => x.id === id);
-  if (m) m.done = !m.done;
-  save();
-  render();
-}
-
-function removeMeal(id) {
-  state.meals = state.meals.filter(m => m.id !== id);
-  save();
-  render();
-}
-
-function resetTodayChecks() {
-  state.meals.forEach(m => m.done = false);
-  save();
-  render();
-  alert('Checks reiniciados!');
-}
-
-function clearAll() {
-  if (!confirm('Apagar todo o histórico e refeições?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  state = { meals: [], wake: '07:00', sleep: '23:00', history: {}, currentDate: todayStr() };
-  render();
-}
-
-/* ============ EVENTOS ============ */
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    ['today','history','settings'].forEach(t => {
-      document.getElementById('tab-' + t).classList.toggle('hide', t !== tab.dataset.tab);
-    });
-    if (tab.dataset.tab === 'history') renderHistory();
-  });
-});
-
-document.getElementById('wake-time').addEventListener('change', e => {
-  state.wake = e.target.value; save(); render();
-});
-document.getElementById('sleep-time').addEventListener('change', e => {
-  state.sleep = e.target.value; save(); render();
-});
-
-// Enter para adicionar
-document.getElementById('new-name').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('new-kcal').focus();
-});
-document.getElementById('new-kcal').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addMeal();
-});
-
-// Verifica mudança de dia a cada minuto
-setInterval(() => {
-  if (state.currentDate !== todayStr()) {
-    saveDayToHistory(state.currentDate);
-    state.meals = [];
-    state.currentDate = todayStr();
-    save();
-    render();
-  }
-}, 60000);
-
-/* ============ INIT ============ */
-load();
-render();
-</script>
-</body>
-  </html>
+  const done = 
