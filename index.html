@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MenuTracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f1115;
+    color: #e8eaed;
+    min-height: 100vh;
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #8a8f98; font-size: 13px; margin-bottom: 20px; }
+
+  .card {
+    background: #1a1d23;
+    border: 1px solid #262a32;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card h2 {
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: #b8bcc4;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  input, button, textarea {
+    font-family: inherit;
+    font-size: 14px;
+  }
+  input[type="text"], input[type="number"], input[type="time"] {
+    background: #0f1115;
+    border: 1px solid #2a2f38;
+    color: #e8eaed;
+    padding: 10px 12px;
+    border-radius: 8px;
+    width: 100%;
+    outline: none;
+    transition: border 0.2s;
+  }
+  input:focus { border-color: #ff8a4c; }
+
+  button {
+    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  button:hover { opacity: 0.9; }
+  button.secondary {
+    background: #262a32;
+    color: #b8bcc4;
+  }
+  button.danger {
+    background: #3a1f24;
+    color: #ff6b81;
+  }
+
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stat {
+    background: #0f1115;
+    border: 1px solid #262a32;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .stat .label { font-size: 11px; color: #8a8f98; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .stat .value.green { color: #4ade80; }
+  .stat .value.orange { color: #ff8a4c; }
+  .stat .value.blue { color: #60a5fa; }
+
+  .progress-bar {
+    height: 10px;
+    background: #0f1115;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 8px;
+    border: 1px solid #262a32;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
+    transition: width 0.4s ease;
+  }
+
+  .meal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #0f1115;
+    border: 1px solid #262a32;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+  .meal.done {
+    background: #16241a;
+    border-color: #2a4a35;
+    opacity: 0.85;
+  }
+  .meal.done .meal-name { text-decoration: line-through; color: #6b7280; }
+
+  .check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #3a3f48;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    background: transparent;
+  }
+  .check.on {
+    background: #4ade80;
+    border-color: #4ade80;
+  }
+  .check.on::after {
+    content: '✓';
+    color: #0f1115;
+    font-weight: 900;
+    font-size: 14px;
+  }
+
+  .meal-info { flex: 1; min-width: 0; }
+  .meal-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .meal-time { font-size: 12px; color: #8a8f98; }
+  .meal-cal { font-size: 13px; color: #ff8a4c; font-weight: 600; white-space: nowrap; }
+
+  .empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 20px;
+    font-size: 13px;
+  }
+
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #0f1115;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .history-item .date { color: #b8bcc4; }
+  .history-item .kcal { color: #ff8a4c; font-weight: 600; }
+  .history-item .count { color: #8a8f98; font-size: 12px; }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: #1a1d23;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    border: 1px solid #262a32;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8a8f98;
+    transition: all 0.2s;
+    background: transparent;
+    border: none;
+  }
+  .tab.active {
+    background: linear-gradient(90deg, #ff8a4c, #ff5e7e);
+    color: #fff;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #262a32;
+    color: #b8bcc4;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    margin-left: 6px;
+  }
+
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🍽️ MenuTracker</h1>
+  <div class="subtitle">Bate o teu menu do dia, todos os dias.</div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="today">Hoje</button>
+    <button class="tab" data-tab="history">Histórico</button>
+    <button class="tab" data-tab="settings">Definições</button>
+  </div>
+
+  <!-- ===================== HOJE ===================== -->
+  <div id="tab-today">
+    <!-- Stats -->
+    <div class="card">
+      <h2>📊 Resumo de Hoje</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="label">Refeições</div>
+          <div class="value blue" id="stat-meals">0 / 0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Calorias</div>
+          <div class="value orange" id="stat-kcal">0</div>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    </div>
+
+    <!-- Adicionar refeição -->
+    <div class="card">
+      <h2>➕ Adicionar Refeição ao Menu</h2>
+      <div class="row" style="margin-bottom:10px;">
+        <input type="text" id="new-name" placeholder="Nome (ex: Frango grelhado)">
+      </div>
+      <div class="row" style="margin-bottom:10px;">
+        <input type="number" id="new-kcal" placeholder="Calorias" min="0">
+      </div>
+      <button onclick="addMeal()" style="width:100%;">Adicionar</button>
+    </div>
+
+    <!-- Menu do dia -->
+    <div class="card">
+      <h2>🍴 Menu de Hoje <span class="badge" id="meal-count-badge">0</span></h2>
+      <div id="meals-list"></div>
+    </div>
+
+    <!-- Horário -->
+    <div class="card">
+      <h2>⏰ Horário de Refeições</h2>
+      <div class="row" style="margin-bottom:12px;">
+        <div>
+          <div class="label" style="font-size:11px;color:#8a8f98;margin-bottom:4px;">Acordar</div>
+          <input type="time" id="wake-time" value="07:00">
+        </div>
+        <div>
+          <div class="label" style="font-size:11px;color:#8a8f98;margin-bottom:4px;">Adormecer</div>
+          <input type="time" id="sleep-time" value="23:00">
+        </div>
+      </div>
+      <div id="schedule-list"></div>
+    </div>
+  </div>
+
+  <!-- ===================== HISTÓRICO ===================== -->
+  <div id="tab-history" class="hide">
+    <div class="card">
+      <h2>🏆 Recordes</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="label">Dia com mais kcal</div>
+          <div class="value green" id="rec-most">—</div>
+          <div class="label" id="rec-most-date" style="margin-top:4px;">—</div>
+        </div>
+        <div class="stat">
+          <div class="label">Dia com menos kcal</div>
+          <div class="value blue" id="rec-less">—</div>
+          <div class="label" id="rec-less-date" style="margin-top:4px;">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📅 Histórico de Dias</h2>
+      <div id="history-list"></div>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button class="danger secondary" onclick="clearAll()">🗑️ Apagar Tudo</button>
+    </div>
+  </div>
+
+  <!-- ===================== DEFINIÇÕES ===================== -->
+  <div id="tab-settings" class="hide">
+    <div class="card">
+      <h2>⚙️ Definições</h2>
+      <p style="font-size:13px;color:#8a8f98;line-height:1.6;">
+        Esta app guarda tudo localmente no teu dispositivo (localStorage).<br><br>
+        • Adiciona as refeições do menu do dia na aba <b>Hoje</b>.<br>
+        • Marca o check quando comeres cada uma.<br>
+        • O horário de refeições é distribuído automaticamente entre a hora de acordar e a de adormecer.<br>
+        • Vê os teus recordes na aba <b>Histórico</b>.
+      </p>
+    </div>
+    <div class="card">
+      <h2>🔔 Tarefas de hoje</h2>
+      <button class="secondary" style="width:100%;margin-bottom:8px;" onclick="resetTodayChecks()">
+        Reiniciar checks de hoje
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ ESTADO ============ */
+const STORAGE_KEY = 'menuTracker_v1';
+
+let state = {
+  meals: [],          // refeições do dia atual [{id, name, kcal, done}]
+  wake: '07:00',
+  sleep: '23:00',
+  history: {},        // { 'YYYY-MM-DD': { meals: [...], wake, sleep } }
+  currentDate: todayStr()
+};
+
+function todayStr() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+function load() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { state = { ...state, ...JSON.parse(raw) }; } catch(e) {}
+  }
+  // Se mudou o dia, guarda o anterior no histórico e reinicia
+  if (state.currentDate !== todayStr()) {
+    saveDayToHistory(state.currentDate);
+    state.meals = [];
+    state.currentDate = todayStr();
+    save();
+  }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function saveDayToHistory(date) {
+  if (!state.meals || state.meals.length === 0) return;
+  state.history[date] = {
+    meals: JSON.parse(JSON.stringify(state.meals)),
+    wake: state.wake,
+    sleep: state.sleep
+  };
+}
+
+/* ============ HELPERS ============ */
+function timeToMinutes(t) {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+function minutesToTime(m) {
+  m = ((m % 1440) + 1440) % 1440;
+  const h = Math.floor(m / 60);
+  const mm = m % 60;
+  return String(h).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+}
+
+/* Distribui N refeições entre acordar e adormecer */
+function distributeTimes(n, wake, sleep) {
+  if (n === 0) return [];
+  let start = timeToMinutes(wake);
+  let end = timeToMinutes(sleep);
+  if (end <= start) end += 1440; // dorme depois da meia-noite
+  const total = end - start;
+
+  const times = [];
+  if (n === 1) {
+    times.push(minutesToTime(start + total / 2));
+  } else {
+    // Intervalos iguais, com margem nas pontas
+    const step = total / (n + 1);
+    for (let i = 1; i <= n; i++) {
+      times.push(minutesToTime(start + step * i));
+    }
+  }
+  return times;
+}
+
+/* ============ RENDER ============ */
+function render() {
+  renderMeals();
+  renderStats();
+  renderSchedule();
+  renderHistory();
+  document.getElementById('wake-time').value = state.wake;
+  document.getElementById('sleep-time').value = state.sleep;
+}
+
+function renderMeals() {
+  const list = document.getElementById('meals-list');
+  const badge = document.getElementById('meal-count-badge');
+  badge.textContent = state.meals.length;
+
+  if (state.meals.length === 0) {
+    list.innerHTML = '<div class="empty">Ainda não adicionaste refeições hoje.</div>';
+    return;
+  }
+  const times = distributeTimes(state.meals.length, state.wake, state.sleep);
+  list.innerHTML = state.meals.map((m, i) => `
+    <div class="meal ${m.done ? 'done' : ''}">
+      <div class="check ${m.done ? 'on' : ''}" onclick="toggleMeal(${m.id})"></div>
+      <div class="meal-info">
+        <div class="meal-name">${escapeHtml(m.name)}</div>
+        <div class="meal-time">⏰ ${times[i]}</div>
+      </div>
+      <div class="meal-cal">${m.kcal} kcal</div>
+      <button class="danger" style="padding:6px 10px;font-size:12px;" onclick="removeMeal(${m.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function renderStats() {
+  const total = state.meals.length;
+  const done = state.meals.filter(m => m.done).length;
+  const kcal = state.meals.filter(m => m.done).reduce((s, m) => s + Number(m.kcal || 0), 0);
+
+  document.getElementById('stat-meals').textContent = `${done} / ${total}`;
+  document.getElementById('stat-kcal').textContent = `${kcal}`;
+  const pct = total ? (done / total) * 100 : 0;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function renderSchedule() {
+  const el = document.getElementById('schedule-list');
+  if (state.meals.length === 0) {
+    el.innerHTML = '<div class="empty">Adiciona refeições para ver os horários.</div>';
+    return;
+  }
+  const times = distributeTimes(state.meals.length, state.wake, state.sleep);
+  el.innerHTML = state.meals.map((m, i) => `
+    <div class="history-item">
+      <span class="date">${times[i]}</span>
+      <span>${escapeHtml(m.name)}</span>
+      <span class="kcal">${m.kcal} kcal</span>
+    </div>
+  `).join('');
+}
+
+function renderHistory() {
+  const entries = Object.entries(state.history).sort((a, b) => b[0].localeCompare(a[0]));
+  const list = document.getElementById('history-list');
+
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="empty">Ainda sem histórico. Volta amanhã!</div>';
+  } else {
+    list.innerHTML = entries.map(([date, day]) => {
+      const totalKcal = day.meals.filter(m => m.done).reduce((s, m) => s + Number(m.kcal || 0), 0);
+      const done = day.meals.filter(m => m.done).length;
+      const total = day.meals.length;
+      const d = new Date(date + 'T00:00:00');
+      const label = d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', weekday: 'short' });
+      return `
+        <div class="history-item">
+          <span class="date">${label}</span>
+          <span class="count">${done}/${total} refeições</span>
+          <span class="kcal">${totalKcal} kcal</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Recordes
+  const withKcal = entries
+    .map(([date, day]) => ({
+      date,
+      kcal: day.meals.filter(m => m.done).reduce((s, m) => s + Number(m.kcal || 0), 0)
+    }))
+    .filter(x => x.kcal > 0);
+
+  if (withKcal.length > 0) {
+    const most = withKcal.reduce((a, b) => a.kcal > b.kcal ? a : b);
+    const less = withKcal.reduce((a, b) => a.kcal < b.kcal ? a : b);
+    document.getElementById('rec-most').textContent = most.kcal + ' kcal';
+    document.getElementById('rec-most-date').textContent = formatDate(most.date);
+    document.getElementById('rec-less').textContent = less.kcal + ' kcal';
+    document.getElementById('rec-less-date').textContent = formatDate(less.date);
+  } else {
+    document.getElementById('rec-most').textContent = '—';
+    document.getElementById('rec-most-date').textContent = '—';
+    document.getElementById('rec-less').textContent = '—';
+    document.getElementById('rec-less-date').textContent = '—';
+  }
+}
+
+function formatDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+/* ============ AÇÕES ============ */
+function addMeal() {
+  const name = document.getElementById('new-name').value.trim();
+  const kcal = parseInt(document.getElementById('new-kcal').value, 10);
+  if (!name) return alert('Dá um nome à refeição.');
+  if (isNaN(kcal) || kcal < 0) return alert('Insere um valor de calorias válido.');
+  state.meals.push({ id: Date.now(), name, kcal, done: false });
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-kcal').value = '';
+  save();
+  render();
+}
+
+function toggleMeal(id) {
+  const m = state.meals.find(x => x.id === id);
+  if (m) m.done = !m.done;
+  save();
+  render();
+}
+
+function removeMeal(id) {
+  state.meals = state.meals.filter(m => m.id !== id);
+  save();
+  render();
+}
+
+function resetTodayChecks() {
+  state.meals.forEach(m => m.done = false);
+  save();
+  render();
+  alert('Checks reiniciados!');
+}
+
+function clearAll() {
+  if (!confirm('Apagar todo o histórico e refeições?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = { meals: [], wake: '07:00', sleep: '23:00', history: {}, currentDate: todayStr() };
+  render();
+}
+
+/* ============ EVENTOS ============ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    ['today','history','settings'].forEach(t => {
+      document.getElementById('tab-' + t).classList.toggle('hide', t !== tab.dataset.tab);
+    });
+    if (tab.dataset.tab === 'history') renderHistory();
+  });
+});
+
+document.getElementById('wake-time').addEventListener('change', e => {
+  state.wake = e.target.value; save(); render();
+});
+document.getElementById('sleep-time').addEventListener('change', e => {
+  state.sleep = e.target.value; save(); render();
+});
+
+// Enter para adicionar
+document.getElementById('new-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('new-kcal').focus();
+});
+document.getElementById('new-kcal').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addMeal();
+});
+
+// Verifica mudança de dia a cada minuto
+setInterval(() => {
+  if (state.currentDate !== todayStr()) {
+    saveDayToHistory(state.currentDate);
+    state.meals = [];
+    state.currentDate = todayStr();
+    save();
+    render();
+  }
+}, 60000);
+
+/* ============ INIT ============ */
+load();
+render();
+</script>
+</body>
+  </html>
